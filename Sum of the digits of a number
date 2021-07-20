@@ -1,0 +1,20 @@
+//sum of the digits in a number up to 7 digits
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int x, y = 1000000, sum = 0; // y represents the maximum number of digits that can be summed
+	cout << "Enter digits to be summed: ";
+	cin >> x;
+	while (x) // loop as long as x isnt 0
+	{
+		sum += (x / y); /* x / y returns how many times y is repeated in x 
+						(in other words if x = 100 and y = 100, there is 1 of y in x) */
+		x = x - y * (x / y); // this changes the value of x to the next digit 
+		// note* if x is less than y we will end back with x (x / y is 0 in this case eliminating that term)
+		y /= 10; // move to the next digit we will need to sum
+	}
+	cout << "sum = " << sum << endl;
+	return 0;
+}
