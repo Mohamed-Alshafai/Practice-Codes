@@ -1,0 +1,21 @@
+//Greatest Common Divisor Calculator
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int x, y, max;
+	int GCD = 0; 
+	cout << "Enter first number: ";
+	cin >> x;
+	cout << "Enter second number: ";
+	cin >> y;
+	if (x < y) max = x; // check which one will be the limit for GCD
+	else max = y; 
+	for (int i = 1; i < max; ++i) // loop through possible GCD values
+	{
+		if (x % i == 0 && y % i == 0) GCD = i; // if both x and y are completely divisible by i, GCD is i
+	}
+	cout << "Greatest Common Divisible is: " << GCD << endl;
+	return 0;
+}
