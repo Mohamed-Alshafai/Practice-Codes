@@ -1,0 +1,64 @@
+//find the N largest integers in an array of any size
+//note* the array is altered and does not retain its original values
+#include <iostream>
+using namespace std;
+
+void largest(int *a, int N, int size); //N is number of integers to output and size is number if integers in the array
+int main()
+{
+	int size; 
+	int N;
+
+	cout << "Enter number of integers: "; //enter size of the array
+	cin >> size;
+
+	int* x = NULL; //initialize a pointer to NULL
+	x = new int[size]; //create a dynamic integer array
+
+	if (x == NULL) //check in case the allocation was not successful 
+	{
+		cout << "Allocation Failed... Exiting" << endl;
+		exit(1);
+	}
+
+	cout << "Enter " << size << " integers: "; // entering integers to the array
+	for (int i = 0; i < size; ++i) 
+	{
+		cin >> x[i];
+	}
+
+	cout << "\nEnter number of values to be returned: "; //entering how many elements to return 
+	cin >> N;
+
+	cout << "\nIn the integer array {" << x[0]; //simple UI format to display the array and the biggest number
+	for (int i = 1; i < size; ++i)
+	{
+		cout << ", " << x[i];
+	}
+	cout << "}" << endl;
+	
+	cout << "Biggest " << N << " integers are: "; largest(x, N, size); cout << endl;
+	
+	delete[] x;
+	return 0;
+}
+
+void largest(int *a, int N, int size)
+{
+	// finding the biggest 3 integers by comparing starting from first integers
+	for (int i = 0; i < N; ++i)
+	{
+		int biggest = a[0], index = 0;
+
+		for (int j = 0; j < size; ++j)
+		{
+			if (biggest < a[j])
+			{
+				biggest = a[j];
+				index = j; //remember the index of the largest value
+			}
+		}
+		a[index] = INT_MIN; // discarding the previously-biggest value
+		cout << biggest << " ";
+	}
+}
