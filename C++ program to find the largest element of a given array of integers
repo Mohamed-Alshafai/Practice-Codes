@@ -1,0 +1,28 @@
+//find the largest integer in an array by 
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int x[10];
+	cout << "Enter 10 integers: ";
+	for (int i = 0; i < 10; ++i) // entering the integers up to 10
+	{
+		cin >> x[i];
+	}
+	
+	int biggest = x[0]; // finding the biggest integer by comparing starting from first integers
+	for (int i = 0; i < 10; ++i)
+	{
+		if (biggest < x[i]) biggest = x[i];
+	}
+	
+	cout << "In the integer array {" << x[0]; //simple UI format to display the array and the biggest number
+	for (int i = 1; i < 10; ++i)
+	{
+		cout << ", " << x[i];
+	}
+	cout << "}" << endl << "The biggest integer is: " << biggest << endl;
+
+	return 0;
+}
