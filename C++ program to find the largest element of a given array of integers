@@ -1,4 +1,4 @@
-//find the largest integer in an array by 
+//find the largest integer in an array of 10 integers
 #include <iostream>
 using namespace std;
 
