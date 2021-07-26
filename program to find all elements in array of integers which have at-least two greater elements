@@ -1,0 +1,42 @@
+// program to find all elements in array of integers which have at-least two greater elements
+#include <iostream>
+using namespace std;
+
+void TwoG(int x[], int N);
+int main()
+{
+	int x[] = { 5, 1, 8, 9, 2, 4, 6, 10, 3, 7 };
+	int N = (sizeof(x) / sizeof(x[0]));
+	
+	cout << "In the array: "; // outputing the array
+	for (int i = 0; i < N; ++i)
+	{
+		cout << x[i] << " ";
+	}
+
+	cout << "\nThe values with atleast 2 greater elements are: "; TwoG(x, N); cout << endl; //function call UI
+	return 0;
+}
+
+void TwoG(int x[], int N)
+{
+	int g1 = 0; // check if there wasnt atleast 1 element with 2 greater elements than it
+	for (int i = 0; i < N; ++i) // looping through the array elements
+	{
+		int g2 = 0; // check if the element has 2 greater elements at least
+		for (int j = 0; j < N; ++j) //checking against the other array elements
+		{
+			if (x[j] > x[i]) ++g2;
+		}
+		if (g2 >= 2) // condition check
+		{
+			cout << x[i] << " ";
+			++g1;
+		}
+	}
+	if (g1 == 0) // condition check
+	{
+		cout << "No values found... exiting" << endl; 
+		exit(1);
+	}
+}
