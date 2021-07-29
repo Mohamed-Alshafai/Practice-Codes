@@ -1,0 +1,129 @@
+//Assignment Details
+/* 
+Write a C++ program that reads in a file that contains student names and corresponding CGPs. 
+The content of the file looks like the following (where the first entry the number of record or array size):
+arraySize
+First_name Last_name CGPA
+…
+Your program will do the following:
+Prompt the user for the file name and open it. If it fails, then exit the program
+Read each line and store it in three dynamic arrays. One for the first name,
+one for the second name and a third one for the CGPAs.
+Find the average CGPA.
+Print to an output file the name of each student and the difference between his/her CGPA and the average.
+You can call the output file “grades_from_avg.txt”.
+Close the files once done.
+
+Example input file:
+
+5
+Sami Elbab 4.0
+Raghad 	Hamdi 3.9
+Samer Ajweh 3.8
+Jamal Badr 2.3
+Nabil Jameel 1.0
+
+Example output file:
+
+Sami Elbab 1
+Raghad Hamdi 0.9
+Samer Ajwah 0.8
+Jamal Badr -0.7
+Nabil Jameel -2
+*/
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+enum errors
+{
+	NameF = 0, NameL, Grade 
+};
+class arrayLog
+{
+public:
+	void Error(int error = -1)
+	{
+		if (error == -1) cout << "Array was established successfully." << endl;
+		else if (error == NameF)
+		{
+			cout << "First name array couldn't be established... exiting" << endl;
+			exit(1);
+		}
+		else if (error == NameL)
+		{
+			cout << "Last name array couldn't be established... exiting" << endl;
+			exit(1);
+		}
+		else if (error == Grade)
+		{
+			cout << "CGPA array couldn't be established... exiting" << endl;
+			exit(1);
+		}
+	}
+};
+
+
+int main()
+{
+	// variables
+	int arrSize;
+	string file;
+	string stdInfo;
+	double sum = 0, avgCGPA;
+	// accessing file
+	cout << "Enter text file name to use for input: ";
+	getline(cin, file);
+	// creating fstreams
+	ifstream in(file);
+	ofstream out("grades_from_avg.txt");
+	// cheaking fstreams' accessibility
+	if (in.fail())
+	{
+		cout << "Couldn't Acces " << file << "...Exiting" << endl;
+		exit(1);
+	}
+	else cout << file << " was accessed successfuly... resuming operations." << endl;
+	
+	if (out.fail())
+	{
+		cout << "Couldn't Acces grades_from_avg.txt file...Exiting" << endl;
+		exit(1);
+	}
+	else cout << "grades_from_avg.txt was accessed successfuly... resuming operations." << endl;
+	// entering size of array
+	in >> arrSize;
+	// creating dynamic arrays 
+	string* fName = NULL; string* lName = NULL; 
+	double* CGPA = NULL;
+	fName = new string[arrSize]; lName = new string[arrSize]; 
+	CGPA = new double[arrSize];
+	//dynamic arrays successful creation check
+	arrayLog dArrays;
+	if (fName == NULL) dArrays.Error(NameF);
+	if (lName == NULL) dArrays.Error(NameL);
+	if (CGPA == NULL) dArrays.Error(Grade);
+	// parsing through input file
+	while (!in.eof())
+	{
+		static 	int i = 0;
+		in >> fName[i] >> lName[i] >> CGPA[i];
+		sum += CGPA[i];
+		++i;
+	}
+	// calculating avg CGPA
+	avgCGPA = sum / (double)arrSize;
+	// outputing info to output file
+	for (int i = 0; i < arrSize; ++i)
+	{
+		out << fName[i] << ' ' << lName[i] << ' ' << (CGPA[i] - avgCGPA) << endl;
+	}
+	// closing functions
+	in.close();
+	delete[] fName;
+	delete[] lName;
+	delete[] CGPA;
+	// end of main
+	return 0;
+}
