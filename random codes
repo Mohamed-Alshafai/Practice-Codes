@@ -1,0 +1,351 @@
+
+/*
+void readFile(string fileName, vector<string>& fName, vector<string>& lName, vector<int>& phone);
+int searchByFirstName(vector<string>& fName, string target);
+int searchByLastName(vector<string>& lName, string target);
+int searchByPhone(vector<int>& phone, int target);
+void saveFile(string fileName, vector<string>& fName, vector<string>& lName, vector<int>& phone);
+void printMenu();
+int main()
+{
+	vector<string> fName;
+	vector<string> lName;
+	vector<int> phone;
+	string fileName;
+	string target;
+	int t;
+	int action, lastPos = -1;
+
+	cout << "Enter file name for input: ";
+	getline(cin, fileName);
+	readFile(fileName, fName, lName, phone);
+	printMenu();
+	while (true)
+	{
+		cin >> action;
+		if (action == 1)
+		{
+			cout << "Enter target's first name: ";
+			cin >> target;
+			lastPos = searchByFirstName(fName, target);
+			if (lastPos == -1) cout << "Error404... no contact found!" << endl;
+			else cout << "Contact's info is: " << fName[lastPos] << ' ' << lName[lastPos] << ' ' << phone[lastPos] << endl;
+		}
+		if (action == 2)
+		{
+			cout << "Enter target's last name: ";
+			cin >> target;
+			lastPos = searchByLastName(lName, target);
+			if (lastPos == -1) cout << "Error404... no contact found!" << endl;
+			else cout << "Contact's info is: " << fName[lastPos] << ' ' << lName[lastPos] << ' ' << phone[lastPos] << endl;
+		}
+		if (action == 3)
+		{
+			cout << "Enter target's phone number: ";
+			cin >> t;
+			lastPos = searchByPhone(phone, t);
+			if (lastPos == -1) cout << "Error404... no contact found!" << endl;
+			else cout << "Contact's info is: " << fName[lastPos] << ' ' << lName[lastPos] << ' ' << phone[lastPos] << endl;
+		}
+		if (action == 4)
+		{
+			if (lastPos == -1) cout << "Error404... no contact found!" << endl;
+			else cout << "Last contact's info is: " << fName[lastPos] << ' ' << lName[lastPos] << ' ' << phone[lastPos] << endl;
+		}
+		if (action == 5)
+		{
+			cout << "Enter target's phone number: ";
+			cin >> t;
+			lastPos = searchByPhone(phone, t);
+			if (lastPos == -1) cout << "Error404... no contact found!" << endl;
+			else
+			{
+				fName.erase(fName.begin() + lastPos);
+				lName.erase(lName.begin() + lastPos);
+				phone.erase(phone.begin() + lastPos);
+				cout << "Target deleted successfully!" << endl;
+			}
+		}
+		if (action == 6)
+		{
+			saveFile(fileName, fName, lName, phone);
+			exit(1);
+		}
+	}
+	return 0;
+}
+
+void readFile(string fileName, vector<string>& fName, vector<string>& lName, vector<int>& phone)
+{
+	fName.clear();
+	lName.clear();
+	phone.clear();
+
+	string t_fName, t_lName; 
+	int t_phone;
+	
+	ifstream myCin(fileName);
+	if (myCin.fail())
+	{
+		cout << "Failed to open " << fileName << " for reading... Exiting" << endl;
+		exit(1);
+	}
+	else cout << fileName << " was opened successfully for reading." << endl;
+
+	myCin >> t_fName >> t_lName >> t_phone;
+	while (!myCin.eof())
+	{
+		fName.push_back(t_fName);
+		lName.push_back(t_lName);
+		phone.push_back(t_phone);
+		myCin >> t_fName >> t_lName >> t_phone;
+	}
+	myCin.close();
+}
+
+int searchByFirstName(vector<string>& fName, string target)
+{
+	for (int i = 0; i < fName.size(); ++i)
+	{
+		if (fName[i].find(target) != -1) return i;
+	}
+	return -1;
+}
+
+int searchByLastName(vector<string>& lName, string target)
+{
+	for (int i = 0; i < lName.size(); ++i)
+	{
+		if (lName[i].find(target) != -1) return i;
+	}
+	return -1;
+}
+
+int searchByPhone(vector<int>& phone, int target)
+{
+	for (int i = 0; i < phone.size(); ++i)
+	{
+		if (phone[i] == target) return i;
+	}
+	return -1;
+}
+
+void saveFile(string fileName, vector<string>& fName, vector<string>& lName, vector<int>& phone)
+{
+	string t_fName, t_lName;
+	int t_phone;
+	ofstream myCout(fileName);
+	if (myCout.fail())
+	{
+		cout << "Failed to access " << fileName << " for saving... exiting" << endl;
+		exit(1);
+	}
+	else cout << fileName << " was opened successfully for saving." << endl;
+	int i = 0;
+	while (i <= fName.size())
+	{
+		
+		t_fName = fName[i];
+		t_lName = lName[i];
+		t_phone = phone[i];
+		myCout << t_fName << ' ' << t_lName << ' ' << t_phone << endl;
+		++i;
+	}
+}
+
+void printMenu()
+{
+	cout << "          Menu  \n";
+	cout << "1. Search by First Name.\n";
+	cout << "2. Search by Last Name.\n";
+	cout << "3. Search by Phone.\n";
+	cout << "4. Show the last contact.\n";
+	cout << "5. Delete contact by phone number.\n";
+	cout << "6. Exit.\n";
+	cout << "Enter your choice :";
+}
+*/
+/*
+int main()
+{
+	float a1, a2, b1, b2;
+	do {
+		cout << "Enter a range for x coordinates: " << endl;
+		cin >> a1 >> a2;
+	} while (a1 > a2);
+	//to ensure a1 is going to be smaller than b2 
+	do {
+		cout << "Enter a range for y coordinates: " << endl;
+		cin >> b1 >> b2;
+	} while (b1 > b2);
+	//to ensure b1 is going to be smaller than b2
+	cout << "Plotting path........ " << endl << endl;
+	//in the sample picture there is an empty line under the phrase
+	for (int i = b1; i <= b2; i++) 
+	{
+		for (int j = a1; j <= a2; j++) 
+		{
+			if (j == i * i) 
+			{
+				//I used it instead of pow since the paper does not mention if we can use pow
+				cout << "* (" << j << "," << i << ")" << endl;
+				breasize;
+			}
+			else 
+			{
+				cout << " ";// to leave a space before the *
+			}
+
+		}
+	}
+}
+*/
+/*#include <iostream>
+#include <cmath>
+//for using pow and abs
+using namespace std;
+int main() {
+	float x1, x2, y1, y2;
+	do {
+		cout << "Enter a range for x cordinaties: " << endl;
+		cin >> x1 >> x2;
+	} while (x1 > x2);
+	//to ensure x1 is going to be smaller than x2 
+	do {
+		cout << "Enter a range for y cordinaties: " << endl;
+		cin >> y1 >> y2;
+	} while (y1 > y2);
+	//to ensure y1 is going to be smaller than y2
+	cout << "Searching for planets........ " << endl;
+	for (int i = x1; i <= x2; i++) {
+		for (int j = y1; j <= y2; j++) {
+			if (2 * pow(i, 2) + abs(2 * i * j) + pow(j, 2) == 10000) {
+				//2x² + |2xy| + y² =10000
+				cout << "There is a planet at " << i << "," << j << endl;
+			}
+		}
+	}
+	return 0;
+}
+*/
+/*
+int main()
+{
+
+	int n, sum = 0, i = 1; //'i' for the position of the number in the series
+	cout << "Enter numbers for the series: " << endl;
+	while (cin >> n)
+	{
+		if (i % 2 == 0 && n > 0) //if the number is in the even numbered positions it'll be negative
+		{
+			n *= -1;
+		}
+		if (i % 2 != 0 && n < 0)
+		{
+			n *= -1;
+		}
+		
+		if (n <= 0) // if number is 0 or negative term = number * 10
+		{
+			n *= 10;
+			sum += n;
+		}
+		else if (n > 0 && n <= 5) //if number is less than 5 term = number * 5
+		{
+			n *= 5;
+			sum += n;
+		}
+		else if (n > 5) sum += n; //otherwise its the same, in other terms if its bigger or equal to 5
+		++i; //move to the next position in the series
+	}
+	
+	cout << "Summation series = " << sum << endl;
+	
+	return 0;
+}
+/* draw an x shape program
+#include <cstring>
+#include <cstdlib>
+int main()
+{
+	int size, lastpos;
+	cout << "Enter size of spell: ";
+	cin >> size;
+	cout << "FLAGRATE!" << endl;
+	lastpos = size;
+	for (int i = 1; i <= size; ++i)
+	{
+		for (int j = 1; j <= size; ++j)
+		{
+			if (j == lastpos || j == size - (lastpos -1))
+			{
+				cout << "*";
+			}
+			else cout << " ";
+		}
+		cout << endl;
+		--lastpos;
+	}
+	return 0;
+}
+*/
+/* guess the missing number from the series program
+#include <cstring>
+#include <cstdlib>
+int main()
+{
+	int first = 0, second = 1, third, i = 1, n, random, randomFib;
+	char a = '_';
+	srand(time(NULL));
+	random = rand() % (10 - 1) + 1;
+	while (i <= 10)
+	{
+
+		if (i == 1)
+		{
+			if (i == random)
+			{
+				cout << a << " ";
+				randomFib = 0;
+			}
+			else
+				cout << 0 << " ";
+		}
+		else if (i == 2)
+		{
+			if (i == random)
+			{
+				cout << a << " ";
+				randomFib = 1;
+			}
+			else
+				cout << 1 << " ";
+		}
+		else
+		{
+			third = first + second;
+			if (random == i)
+			{
+				cout << a << " ";
+				first = second;
+				second = third;
+				randomFib = third;
+			}
+			else
+			{
+				cout << third << " ";
+				first = second;
+				second = third;
+			}
+		}
+		i++;
+	}
+	cout << "\nEnter the missing term: ";
+	cin >> n;
+	if (n == randomFib)
+		cout << "\nCommunicator unlocsizeed";
+	else
+		cout << "\nCommunicator locsizeed";
+	return 0;
+}
+*/
