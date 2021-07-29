@@ -1,0 +1,91 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+class Employee
+{
+public:
+	// memember variable 
+	vector<string> name;
+	vector<int> YoJ;
+	vector<string> address;
+	// memebr funtions
+	void addInfo(const string fileName);
+	void printInfo(const string fileName);
+};
+
+int main()
+{
+	// creating string for and entering text file name
+	string fileName;
+	cout << "Enter employees' file name: ";
+	cin >> fileName;
+	// creating object employees of type Employee
+	Employee employees;
+	// calling member functions
+	employees.addInfo(fileName);
+	employees.printInfo("OrganizedEmployeeInfo.txt");
+	// end of main
+	return 0;
+}
+
+void Employee::addInfo(const string fileName)
+{
+	// temporary variables to move the values from input file to vectors
+	string t_name;
+	string t_address;
+	int t_YoJ;
+	// creating input stream and accessing file
+	ifstream myCin(fileName);
+	// checking if accessing was unsuccessful
+	if (myCin.fail())
+	{
+		cout << "Failed to open " << fileName << " for input... exiting!" << endl;
+		exit(1);
+	}
+	else cout << fileName << " was opened successfully for input!" << endl;
+	// input the first line first
+	myCin >> t_name >> t_YoJ >> t_address;
+
+	while (!myCin.eof())
+	{
+		// assign the values to the vectors
+		name.push_back(t_name);
+		YoJ.push_back(t_YoJ);
+		address.push_back(t_address);
+		// input for next iteration
+		myCin >> t_name >> t_YoJ >> t_address;
+	}
+	// close input stream
+	myCin.close();
+}
+
+void Employee::printInfo(const string fileName)
+{
+	// creating output stream and accessing file
+	ofstream myCout(fileName);
+	// check if file wasn't accessed
+	if (myCout.fail())
+	{
+		cout << "Failed to open " << fileName << " for output... exiting!" << endl;
+		exit(1);
+	}
+	else cout << fileName << " was opened successfully for output!" << endl;
+	// loop to iterate through vector indexes
+	for (unsigned int i = 0; i < name.size(); ++i)
+	{
+		// only print this once for formatting
+		if (i == 0) myCout << "Name\t" << "Year of Joining\t\t" << "Address" << endl;
+		// printing the vector values
+		myCout << name[i] << "\t\t" << YoJ[i] << "\t\t" << address[i] << endl;
+	}
+	// close output stream
+	myCout.close();
+	// clear vectors in case they might be reused in another file
+	name.clear();
+	YoJ.clear();
+	address.clear();
+}
