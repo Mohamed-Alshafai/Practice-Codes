@@ -1,0 +1,92 @@
+#include <iostream>
+using namespace std;
+
+double* addValue(double* arr_in, int& size, double newValue);
+double* deleteValue(double* arr_in, int& size, double deleteValue);
+void printArr(double* arr_in, int size);
+
+int main()
+{
+	int size;
+	cout << "Enter size of array: ";
+	cin >> size;
+	double* arr_in = NULL;
+	arr_in = new double[size];
+	if (arr_in == NULL)
+	{
+		cout << "Dynamic array allocation failed... Exiting" << endl;
+		exit(1);
+	}
+	cout << "Enter array values seperated by a space: " << endl;
+	for (int i = 0; i < size; ++i)
+	{
+		cin >> arr_in[i];
+	}
+	printArr(arr_in, size);
+	arr_in = addValue(arr_in, size, 6.3);
+	printArr(arr_in, size);
+	arr_in = deleteValue(arr_in, size, 9.3);
+	printArr(arr_in, size);
+	delete[] arr_in;
+	return 0;
+}
+
+
+double* addValue(double* arr_in, int& size, double newValue)
+{
+	double* addArr; addArr = new double[size+1]; // dynamic array creation and allocation
+	for (int i = 0; i < size + 1; ++i) 
+	{
+		if (i < size) addArr[i] = arr_in[i]; //assigning to new array
+		else if (i == size) addArr[i] = newValue; //assigning the new value at the end
+	}
+	size++; //incrementing size to account for the new value
+	delete[] arr_in; // delete old dynamic array
+	return addArr; // return new array
+}
+
+double* deleteValue(double* arr_in, int& size, double deleteValue)
+{
+	double* dltArr; dltArr = new double[size - 1]; // dynamic array creation and allocation
+	int found = -1; // check for position of to-be-deleted value
+	for (int i = 0; i < size; ++i) // checking for instances of deleteValue
+	{
+		if (arr_in[i] == deleteValue) // if instance found
+		{
+			found = i; // assigning index of the instance to found
+			break; // exiting loop
+		}
+	}
+	if (found == -1) // if found wasnt changed
+	{
+		return arr_in; // return the same array
+	}
+	else if (found != -1) // if found isnt -1
+	{
+		for (int i = 0, j = 0; j < size; ++i, ++j) // for loop with 2 variable and 1 condition
+		{
+			if (j == found) // if j is = to found (IE is the to-be-deleted variable 
+			{
+				++j; //go to the next j
+				continue; //continue to next loop
+			}
+			else dltArr[i] = arr_in[j]; // otherwise assign arra-in to dltarr
+		}
+	}
+	size--; //decrement size of array
+	delete[] arr_in; //delete old array
+	return dltArr; //return new array
+}
+
+void printArr(double* arr_in, int size)
+{
+	cout << "Elements of array are: " << endl;
+	bool first = true;
+	for (int i = 0; i < size; ++i)
+	{
+		if (!first) cout << ' ';
+		cout << arr_in[i];
+		first = false;
+	}
+	cout << endl;
+}
