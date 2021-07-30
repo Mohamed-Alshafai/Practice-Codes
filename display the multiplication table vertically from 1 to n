@@ -1,0 +1,19 @@
+//vertical multiplication table of first nth numbers
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	int n;
+	cout << "enter upperbound for multiplication table: ";
+	cin >> n;
+	for (int i = 1; i <= 12; ++i) // loop through first 12 numbers
+	{
+		for (int j = 1; j <= n; ++j) // first n multiplications of i
+		{
+			cout << j << "x" << i << " = " << j * i << "  "; // display of multiplcation
+		}
+		cout << endl; // new line for the next multiplication
+	}
+	return 0;
+}
