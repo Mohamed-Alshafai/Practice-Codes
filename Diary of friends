@@ -1,0 +1,103 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <ctime>
+
+class frend 
+{
+public:
+    std::string name;
+    long int timestamp;
+    frend* FoF = NULL;
+    // you cannot ADD any more attributes
+    // make changes starting here 
+    // constructors
+    frend() :name(""), timestamp(0) {}
+    frend(std::string Name) : name(Name), timestamp (0) {}
+    // member functions
+    void add(frend* newFoF)
+    {
+        FoF = newFoF;
+    }
+    // stop changes ending here
+};
+class diary 
+{
+public:
+    frend** frendo;
+    int size;
+
+    // constructors
+    diary(int diarySize) : size(diarySize) { frendo = new frend * [size](); }
+   
+    // member functions
+
+    void add(frend* newFriend, int entryNumber) // function for a new friend entry
+    {
+        if (entryNumber < size) // check if the entry isn't more than the size of our diary
+        {
+            frendo[entryNumber] = newFriend; // point frendo[index] to the new friend
+            frendo[entryNumber]->timestamp = time(NULL); //assign time stamp to timestamp
+        }
+        else std::cout << "Diary is full." << std::endl; // if diary is full 
+    }
+
+private: // no need for access outside this class
+    std::string timeofEntry(const long int& Stamp) // calculate time of entry
+    {
+        std::string timestamp; // create a string
+        time_t T_timeStamp = Stamp; // create and set time to the time of entry
+        struct tm* entryTime = localtime(&T_timeStamp); // point entryTime to a 
+                                                        //pointer with the time info filled
+        timestamp = asctime(entryTime); // get time and assign it to the string
+        timestamp.erase(std::remove(timestamp.begin(), timestamp.end(), '\n'), timestamp.end()); 
+        // format the string such as there is no new line at the end
+        return timestamp; // return the string
+    }
+
+public:
+    void print_names() // printing friends' names
+    {
+        for (int i = 0; frendo[i] != NULL; ++i) // if frendo isnt pointing to a null
+        {
+            std::cout << timeofEntry(frendo[i]->timestamp) << ", " << frendo[i]->name << std::endl; // print the friend name 
+        }
+    }
+
+    void print_fof() // print friends of friends
+    {
+        for (int i = 0; frendo[i] != NULL; ++i) // if frendo isnt pointing to a null
+        {
+            if (frendo[i]->FoF != NULL) // if it contains a name
+                std::cout << frendo[i]->name << " has "
+                << frendo[i]->FoF->name << " as a friend" << std::endl; // print the name 
+            else std::cout << frendo[i]->name 
+                << " has no friends, I'm afraid" << std::endl; // else print this
+        }
+    }
+
+    // destructors
+public:
+    ~diary()
+    {
+        delete[] frendo; // delete frendo dynamic array
+    }
+};
+
+int main() 
+{
+    // create a diary that can take at most 10 friends.
+    diary d(10);
+    frend* tarzan = new frend("tarzan");
+    frend* jane = new frend("jane");
+    frend* monkey = new frend("monkey");
+    d.add(tarzan, 0);
+    d.add(jane, 1);
+    d.add(monkey, 2);
+    d.print_names();
+    d.print_fof();
+    tarzan->add(jane);
+    jane->add(monkey);
+    d.print_fof();
+    return 0;
+}
