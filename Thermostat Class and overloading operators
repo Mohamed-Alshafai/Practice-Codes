@@ -1,0 +1,83 @@
+#include <iostream>
+#include <cstdlib>
+
+class thermostat {
+public: // member variables
+    float temp; 
+public: // constructors
+    thermostat() // default constructor
+    {
+        temp = -50.0f;
+    }
+
+    thermostat(float t) : temp(t) {} // constructer with temperature input
+public: // member functions and overloaded operators
+    //comparison by ==
+    bool isEqual(const thermostat& other) const
+    {
+        if (this->temp - other.temp <= 1.0f || other.temp - this->temp <= 1.0f) // check if within 1 degree
+            return true;
+        else return false;
+    }
+    bool operator==(const thermostat& rhs) // == operator overlaoding
+    {
+        return this->isEqual(rhs);
+    }
+    // assignments by =
+    void Assign(const thermostat& rhs)
+    {
+        this->temp = rhs.temp - 1.0f; /*assigning decrements 1 degree from
+                                      the given value for temp then assigns*/
+    }
+    void operator=(const thermostat& rhs) // = operator overloading
+    {
+        if (this->temp == rhs.temp) return; // if the both temps are the same return to main
+        else return this->Assign(rhs); // else assign the value
+    }
+    // subtracting with --
+    void decrement() 
+    {
+        srand(time(NULL)); // creating a random set
+        unsigned int random = rand() % 10 + 1; // assigning a random numb in range [1, 10]
+        this->temp -= float(random); // subtracting said numb from temp
+    }
+    void operator--(int) // post decrement operator overloard
+    {
+        this->decrement(); 
+    }
+    // assignment by <<
+    void AssignSame(const thermostat& rhs) 
+    {
+        this->temp = rhs.temp; // assigning the exact same value
+    }
+    void operator<<(const thermostat& rhs) // left shift operator overload
+    {
+        this->AssignSame(rhs);
+    }
+};
+
+int main()
+{
+    thermostat* t0 = new thermostat();
+    thermostat* t1 = new thermostat(10.1);
+    thermostat* t2 = new thermostat(10.9);
+
+    std::cout << "t0's temp is " << t0->temp << std::endl;
+
+    if (*t1 == *t2)
+        std::cout << "*t1 and *t2 are same" << std::endl;
+    else
+        std::cout << "*t1 and *t2 are different" << std::endl;
+    
+    *t1 = *t2;
+
+    std::cout << "*t1's temp is " << t1->temp << std::endl;
+    
+    (*t1)--;
+    std::cout << "*t1's temp is " << t1->temp << std::endl;
+
+    *t1 << *t2;
+    std::cout << "*t1's temp is " << t1->temp << std::endl;
+    
+    return 0;
+}
