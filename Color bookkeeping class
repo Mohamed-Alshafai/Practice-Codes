@@ -1,0 +1,48 @@
+#include<iostream>
+using namespace std;
+
+class Color
+{
+	// member variables
+public:
+	int red, green, blue; 
+	// constructores
+public:
+	Color() : red(0), green(0), blue(0) {}
+	Color(int t_red, int t_green, int t_blue) : red(t_red), green(t_green), blue(t_blue) {}
+	
+// member functions
+public:
+	void reversePrint(const int& size)
+	{
+		std::cout << "Your colors in reverse order are:" << std::endl;
+		for (int i = size - 1; i >= 0; --i) // initiate i as the last value in the array
+		{
+			std::cout << "Red[" << this[i].red << "] " // print
+				<< "Green [" << this[i].green << "] "
+				<< "Blue [" << this[i].blue << "] " << std::endl;
+		}
+	}
+// destructor
+	~Color() {}
+};
+
+int main()
+{
+	int Red, Green, Blue; // create variables 
+	int size;
+	std::cout << "How many colors will you enter? "; // enter size of dynamic array
+	std::cin >> size;
+
+	Color* colors = new Color[size](); // create dynamci array and set to null
+	for (int i = 0; i < size; ++i)
+	{
+		std::cout << "Please enter Red, Green, and Blue for Color " << i+1 << " : ";
+		std::cin >> Red >> Green >> Blue; // enter color values
+		colors[i] = Color(Red, Green, Blue); // assign color values to appopriate Color pointer
+	}
+
+	colors->reversePrint(size); // call reverse printing function
+	delete[] colors; // delete dynamic array 
+	return 0;
+}
