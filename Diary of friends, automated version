@@ -2,8 +2,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
-
-void diaryActions();
+#include <fstream>
 
 class frend 
 {
@@ -71,7 +70,7 @@ public:
 
     void print_fof() // print friends of friends
     {
-        for (int i = 0; frendo[i] != NULL; ++i) // if frendo isnt pointing to a null
+        for (int i = 0; frendo[i] != NULL && i < size; ++i) // if frendo isnt pointing to a null
         {
             if (frendo[i]->FoF != NULL) // if it contains a name
                 std::cout << frendo[i]->name << " has "
@@ -80,7 +79,35 @@ public:
                 << " has no friends, I'm afraid" << std::endl; // else print this
         }
     }
+    void printToFile(std::string fileName)
+    {
+        std::ofstream myCout(fileName);
+        if (myCout.fail())
+        {
+            std::cout << "Failed to open file for printing... exiting" << std::endl;
+            exit(1);
+        }
+        else std::cout << "File opened successfully... initiating printing process" << std::endl;
 
+        myCout << "Friends list:\n";
+        for (int i = 0; frendo[i] != NULL && i < size; ++i) // if frendo isnt pointing to a null 
+                                                                //AND i didn't exceed the size
+        {
+            myCout << "Date of entry: " <<  timeofEntry(frendo[i]->timestamp) << ", "
+                << frendo[i]->name << std::endl; // print the friend name 
+        }
+
+        myCout << "Friend of friend list:\n";
+        for (int i = 0; frendo[i] != NULL && i < size; ++i) // if frendo isnt pointing to a null
+        {
+            if (frendo[i]->FoF != NULL) // if it contains a name
+                myCout  << frendo[i]->name << " has "
+                << frendo[i]->FoF->name << " as a friend" << std::endl; // print the name 
+            else myCout << frendo[i]->name
+                << " has no friends, I'm afraid" << std::endl; // else print this
+        }
+        myCout.close();
+    }
     // destructors
 public:
     ~diary()
@@ -89,13 +116,15 @@ public:
     }
 };
 
+void diaryActions();
+
 int main() 
 {
     // variables usage place
     int size; /*used at the start*/
     int action, entryNum, entryNumFoF; /*used for while loop structure*/
     std::string entryName; /*used for while loop structure*/
-
+    std::string FileName; /*used for switch case structure*/
     std::cout << "Enter number of entries for the diary: "; // enter size of diary
     std::cin >> size;
 
@@ -141,7 +170,14 @@ int main()
             d.print_fof(); // function call
             break; // exit switch structure
         }
-        case 5: // exiting program
+        case 5: // print full diary to .txt file
+        {
+            std::cout << "Enter .txt file name: ";
+            std::cin >> FileName;
+            d.printToFile(FileName);
+            break; // exit switch structure
+        }
+        case 6: // exiting program
         {
             std::cout << "Exiting Diary... Thank you for your time!" << std::endl;
             exit(0); // no need for break since we're exiting
@@ -166,6 +202,7 @@ void diaryActions() // print diary action list function
         << "2. Add friend of a friend\n"
         << "3. Print friends' names\n"
         << "4. Print friends of friends' names\n"
-        << "5. Exit program"
+        << "5. print diary to text file\n"
+        << "6. Exit program"
         << std::endl;
 }
