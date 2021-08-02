@@ -1,0 +1,120 @@
+#include <iostream>
+
+class Color
+{
+private:
+	int red, green, blue;
+	int checkAndTruncate(int x);
+public:
+	Color() { red = 0; green = 0; blue = 0; }
+	void setRed(int r) { red = checkAndTruncate(r); }
+	void setGreen(int g) { green = checkAndTruncate(g); };
+	void setBlue(int b) { blue = checkAndTruncate(b); }
+	int getRed() { return red; }
+	int getGreen() { return green; }
+	int getBlue() { return blue; }
+	// overloading operators
+	Color add(const Color& RHS)
+	{
+		Color res;
+		res.red = this->red + RHS.red;
+		res.green = this->green + RHS.green;
+		res.blue += this->blue + RHS.blue;
+		return res;
+	}
+	Color add(const int& x)
+	{
+		Color res;
+		res.red = this->red + x;
+		res.green = this->green + x;
+		res.blue = this->blue + x;
+		return res;
+	}
+
+	Color operator+(const Color& RHS)
+	{
+		return this->add(RHS);
+	}
+	Color operator+(const int & x)
+	{
+		return this->add(x);
+	}
+
+	///
+	Color sub(const Color& RHS)
+	{
+		Color res;
+		res.red = this->red - RHS.red;
+		res.green = this->green - RHS.green;
+		res.blue += this->blue - RHS.blue;
+		return res;
+	}
+	Color operator-(const Color & RHS)
+	{
+		return sub(RHS);
+	}
+											// is equal operator
+	bool isEqual(const Color& RHS) const
+	{
+		if ((red == RHS.red) && (green == RHS.green) && (blue == RHS.blue)) return true;
+		else return false;
+	}
+	bool operator==(const Color& RHS) const
+	{
+		return isEqual(RHS);
+	}
+	// friended overloading operators
+
+	friend std::ostream& operator<< (std::ostream& myCout, const Color& other);
+	friend std::istream& operator>> (std::istream& myCin, Color& other);
+
+};
+
+int Color::checkAndTruncate(int x)
+{
+	if (x >= 0 && x <= 255)
+		return x;
+	else if (x < 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return 255;
+	}
+}
+
+std::ostream& operator<< (std::ostream& myCout, const Color& other)
+{
+	myCout << '[' << other.red << ',' << other.green << ',' << other.blue << ']';
+	return myCout;
+}
+
+std::istream& operator>> (std::istream& myCin, Color& other)
+{
+	myCin >> other.red >> other.green >> other.blue;
+	return myCin;
+}
+
+int main()
+{
+	Color col1;
+	Color col2;
+	Color col3;
+	std::cout << "Please enter the first color (red green blue):";
+	std::cin >> col1;
+	std::cout << "Please enter the second color (red green blue):";
+	std::cin >> col2;
+	std::cout << "Please enter the third color (red green blue):";
+	std::cin >> col3;
+	Color col4 = col1 + col2;
+	std::cout << col1 << " + " << col2 << " = " << col4 << std::endl;
+
+	std::cout << col1 << " - " << col2 << " + " << col3 << " = " << col1 - col2 + col3 << std::endl;
+	std::cout << col3 << " + " << col2 << " + 13 = " << col3 + col2 + 13 << std::endl;
+
+	std::cout << col1 << " == " << col2 << " = " << (col1 == col2) << std::endl;
+
+	return 0;
+
+}
