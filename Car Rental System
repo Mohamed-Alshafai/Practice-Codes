@@ -1,0 +1,822 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <math.h>
+//								Classes and Structs and their member functions and global Functions' declarations
+// structs and their member functions
+///////////////////////////////////
+// users struct
+struct users
+{
+private:
+	std::string m_UI, m_username, m_password;
+public:
+	// constructors
+	users() : m_UI("No UI Registered"), m_username("No Username Registered"), m_password("No Password Registered") {}
+	users(std::string t_UI, std::string t_username, std::string t_password)
+		: m_UI(t_UI), m_username(t_username), m_password(t_password) {}
+	users(const users& assignUser)
+	{
+		m_UI = assignUser.m_UI;
+		m_username = assignUser.m_username;
+		m_password = assignUser.m_password;
+	}
+	// operator overloading
+	friend std::istream& operator>>(std::istream& userIn, users& newUser);
+	friend std::ostream& operator<<(std::ostream& userOut, users& newUser);
+	bool isUser(const users& RHS)
+	{
+		if ((m_UI == RHS.m_UI) && (m_username == RHS.m_username) && (m_password == RHS.m_password)) return true;
+		else return false;
+	}
+	bool operator==(const users& RHS)
+	{
+		return this->isUser(RHS);
+	}
+	// Class friend
+	friend class RentalSys;
+	// destructor
+	~users() {}
+};
+// friend oeprator overloading
+std::istream& operator>>(std::istream& userIn, users& newUser)
+{
+	userIn >> newUser.m_UI >> newUser.m_username >> newUser.m_password;
+	return userIn;
+}
+std::ostream& operator<<(std::ostream& userOut, users& User)
+{
+	userOut
+		<< User.m_UI << ' '
+		<< User.m_username << ' '
+		<< User.m_password << std::endl;
+	return userOut;
+}
+// cars struct
+struct cars
+{
+private:
+	// variables
+	std::string m_carManufacturer;
+	std::string m_carName;
+	unsigned int m_YoP, m_Mileage, m_UI;
+	bool m_carAvailability = true;
+public:
+	// constructors
+	cars() :m_carManufacturer("No Car Info"), m_carName("No Car Info"), m_YoP(0), m_Mileage(0), m_UI(-1), m_carAvailability(true) {}
+	cars(std::string Manufacturer, std::string Name, unsigned int YOP, unsigned int MILEAGE, unsigned int UI, bool Availability)
+		: m_carManufacturer(Manufacturer), m_carName(Name), m_YoP(YOP), m_Mileage(MILEAGE), m_UI(UI), m_carAvailability(Availability) {}
+	cars(const cars& copyCar)
+	{
+		m_carManufacturer = copyCar.m_carManufacturer;
+		m_carName = copyCar.m_carName;
+		m_YoP = copyCar.m_YoP;
+		m_Mileage = copyCar.m_Mileage;
+		m_UI = copyCar.m_UI;
+		m_carAvailability = copyCar.m_carAvailability;
+	}
+
+	// operator overloading
+	friend std::istream& operator>>(std::istream& carIn, cars& myCar);
+	friend std::ostream& operator<<(std::ostream& carOut, const cars& myCar);
+
+	// member functions
+	friend class RentalSys;
+	// destructor
+	~cars() {}
+};
+std::istream& operator>>(std::istream& carIn, cars& myCar)
+{
+	carIn >> myCar.m_UI >> myCar.m_carManufacturer >> myCar.m_carName
+		>> myCar.m_YoP >> myCar.m_Mileage >> myCar.m_carAvailability;
+	return carIn;
+}
+std::ostream& operator<<(std::ostream& carOut, const cars& myCar)
+{
+	carOut << myCar.m_UI << ' ' << myCar.m_carManufacturer << ' ' << myCar.m_carName << ' '
+		<< myCar.m_YoP << ' ' << myCar.m_Mileage << ' ' << myCar.m_carAvailability << std::endl;
+	return carOut;
+}
+// renters struct
+struct renters
+{
+public:
+	std::string m_renterUI;
+	std::string m_renterName;
+	unsigned int m_carUI;
+	time_t m_timeStamp;
+
+public:
+	// constructors
+	renters() : m_renterUI("No_UI"), m_renterName("No_Renter"), m_carUI(-1), m_timeStamp(time(NULL)) {}
+	renters(std::string renterUI, std::string renterName, unsigned int carUI, time_t timeStamp)
+		: m_carUI(carUI), m_renterUI(renterUI), m_renterName(renterName), m_timeStamp(timeStamp) {}
+	renters(const renters& cpy)
+	{
+		m_carUI = cpy.m_carUI;
+		m_renterUI = cpy.m_renterUI;
+		m_renterName = cpy.m_renterName;
+		m_timeStamp = cpy.m_timeStamp;
+	}
+	// overloaded operators
+	friend std::istream& operator>>(std::istream& renterIn, renters& renter);
+	friend std::ostream& operator<<(std::ostream& renterIn, renters& renter);
+	bool operator==(const renters& RHS)
+	{
+		if (m_renterName == RHS.m_renterName && m_renterUI == RHS.m_renterUI) return true;
+		else return false;
+	}
+	// friend class
+	friend class RentalSys;
+	// destructors
+	~renters() {}
+};
+std::istream& operator>>(std::istream& renterIn, renters& renter)
+{
+	renterIn >> renter.m_renterUI >> renter.m_renterName >> renter.m_carUI >> renter.m_timeStamp;
+	return renterIn;
+}
+std::ostream& operator<<(std::ostream& renterOut, renters& renter)
+{
+	renterOut << renter.m_renterUI << ' '
+		<< renter.m_renterName << ' '
+		<< renter.m_carUI << ' '
+		<< renter.m_timeStamp << std::endl;
+	return renterOut;
+}
+// classes and their member functions
+// Users database class
+class usersDB
+{
+private:
+	// private member variables
+	std::vector<users> m_usersInfo;
+	const users Admin{ "93", "Admin", "Admin" };
+	users LoggedUser;
+	std::ofstream m_myInfoCout;
+	std::ifstream m_myInfoCin;
+	// private member functions
+	void registerExistingUsers()
+	{
+		m_myInfoCout.open("Login Info Database.txt", std::ios::app);
+		m_myInfoCin.open("Login Info Database.txt");
+		users existingUser;
+		while (m_myInfoCin >> existingUser)
+		{
+			m_usersInfo.emplace_back(existingUser);
+		}
+		m_myInfoCout.close();
+		m_myInfoCin.close();
+	}
+	void printLoginInfo()
+	{
+		m_myInfoCout.open("Login Info Database.txt");
+		m_myInfoCin.open("Login Info Database.txt");
+		for (unsigned int i = 0; i < m_usersInfo.size(); ++i) // i starts from the number of users existing
+		{
+			m_myInfoCout << m_usersInfo[i];
+		}
+		m_myInfoCout.close();
+		m_myInfoCin.close();
+	}
+	bool usernameCheck(std::string t_username)
+	{
+
+		if (t_username.size() < 6 || t_username.size() > 30) // length must be [6, 30] characters long
+		{
+			std::cout << "Incorrect Username Length!" << std::endl;
+			return false;
+		}
+
+		unsigned int upperCheck = 0;
+		unsigned int lowerCheck = 0;
+		for (unsigned int i = 0; i < t_username.size(); ++i) // username must contain atleast 2 lowcase letters
+		{
+			if (t_username[i] >= 'a' && t_username[i] <= 'z') ++lowerCheck;
+			if (t_username[i] >= 'A' && t_username[i] <= 'Z') ++upperCheck;
+
+			if (i == (t_username.size() - 1) && lowerCheck < 1)
+			{
+				std::cout << "Not enough lower case letters!" << std::endl;
+				return false;
+			}
+
+			if (i == (t_username.size() - 1) && upperCheck < 1)
+			{
+				std::cout << "Not enough upper case letters!" << std::endl;
+				return false;
+			}
+		}
+		std::cout << "Name Accepted!" << std::endl;
+		return true;
+	}
+	bool passwordCheck(std::string t_password)
+	{
+		if (t_password.size() < 8 || t_password.size() > 15) // length must be [6, 15] characters long
+		{
+			std::cout << "Incorrect Password Length!" << std::endl;
+			return false;
+		}
+		unsigned int upperCheck = 0;
+		unsigned int lowerCheck = 0;
+		for (unsigned int i = 0; i < t_password.size(); ++i) // password must contain atleast 2 lowcase letters
+		{
+			if (t_password[i] >= 'a' && t_password[i] <= 'z') ++lowerCheck;
+			if (t_password[i] >= 'A' && t_password[i] <= 'Z') ++upperCheck;
+
+			if (i == (t_password.size() - 1) && (upperCheck + lowerCheck) < 2)
+			{
+				std::cout << "Not enough letters!" << std::endl;
+				return false;
+			}
+
+		}
+		std::cout << "Password Accepted!" << std::endl;
+		return true;
+	}
+
+public:
+	// constructors
+	usersDB()
+	{
+		registerExistingUsers();
+		printLoginInfo();
+	}
+	// public member functions
+	bool logIn();
+	void signUp();
+	// friend class
+	friend class RentalSys;
+	// destructor
+	~usersDB()
+	{
+		printLoginInfo();
+		m_usersInfo.clear();
+	}
+};
+bool usersDB::logIn()
+{
+	std::cout << "Enter UI, username, and password:" << std::endl;
+	std::cin >> LoggedUser;
+
+	if (LoggedUser == Admin) return true;
+	for (unsigned int i = 0; i < m_usersInfo.size(); ++i)
+	{
+		if (LoggedUser == m_usersInfo[i]) return true;
+	}
+	return false;
+}
+void usersDB::signUp()
+{
+	//variables
+	std::string t_UI, t_name, t_password;
+	// UI input
+	std::cout << "Enter UI (Unique Identifier): ";
+	std::cin >> t_UI;
+	if (t_UI.size() > 8)
+	{
+		while (t_UI.size() > 8)
+		{
+			std::cout << "Please enter a UI with less than 8 characters: ";
+			std::cin >> t_UI;
+		}
+	}
+	else std::cout << "UI Accepted!" << std::endl;
+
+	// name input
+	std::cout << "Enter name: ";
+	std::cin >> t_name;
+	while (!usernameCheck(t_name))
+	{
+		std::cout << "Enter another name: ";
+		std::cin >> t_name;
+	}
+
+	// password input
+	std::cout << "Enter password: ";
+	std::cin >> t_password;
+	while (!passwordCheck(t_password))
+	{
+		std::cout << "Enter another password: ";
+		std::cin >> t_password;
+	}
+	// new users to add to vector with
+	users newUser(t_UI, t_name, t_password);
+
+	// assign user to vector
+	m_usersInfo.emplace_back(newUser);
+	LoggedUser = newUser;
+	// register login info in database
+	printLoginInfo();
+}
+// Cars database class
+class carsDB
+{
+private:
+	// private member variables
+	std::vector<cars> m_CarRegistrar;
+	std::ifstream m_isCar;
+	std::ofstream m_osCar;
+	unsigned int m_numOfCars = 0;
+	// private member functions
+	void registerExistingCars()
+	{
+		m_osCar.open("Car Register.txt", std::ios::app);
+		m_isCar.open("Car Register.txt");
+		cars existingUser;
+		while (m_isCar >> existingUser)
+		{
+			m_CarRegistrar.emplace_back(existingUser);
+			++m_numOfCars;
+		}
+		m_osCar.close();
+		m_isCar.close();
+	}
+	void printCarInfo()
+	{
+		m_osCar.open("Car Register.txt");
+		m_isCar.open("Car Register.txt");
+		for (unsigned int i = 0; i < m_CarRegistrar.size(); ++i) // i starts from the number of cars existing everytime
+		{
+			m_osCar << m_CarRegistrar[i];
+		}
+		m_osCar.close();
+		m_isCar.close();
+	}
+	void registerNewCars(unsigned int numOfCars = 1)
+	{
+		cars newCar;
+		numOfCars += m_CarRegistrar.size();
+		for (unsigned int i = m_CarRegistrar.size(); i < numOfCars; ++i)
+		{
+			std::cout << "Enter car's UI(starting from " << m_CarRegistrar.size() << " till " << (numOfCars - 1)
+				<< "), manufacturer, name, year of productions, mileage, and availability:" << std::endl;
+			std::cin >> newCar;
+			this->m_CarRegistrar.emplace_back(newCar);
+		}
+		printCarInfo();
+	}
+	void carInfo() const
+	{
+		std::cout << "Manufacturer:		name:	  year of production	 Mileage(Km)	Availability" << std::endl;
+		for (unsigned int i = 0; i < (this->m_CarRegistrar.size()); ++i)
+		{
+			std::cout << this->m_CarRegistrar[i];
+		}
+	}
+	void carInfo(const unsigned int& INDEX) const
+	{
+		std::cout << "Manufacturer:		name:		year of production		Mileage(Km)		Availability" << std::endl;
+		std::cout << this->m_CarRegistrar[INDEX];
+	}
+
+public:
+	// constructors
+	carsDB()
+	{
+		registerExistingCars();
+		printCarInfo();
+	}
+	// public member functions
+
+	// friend class
+	friend class RentalSys;
+	// destructors
+	~carsDB()
+	{
+		printCarInfo();
+		m_CarRegistrar.clear();
+	}
+};
+// Renal system
+class RentalSys
+{
+private:
+	// private member variables
+	usersDB* m_usersDataBase = new usersDB;
+	carsDB* m_carsDataBase = new carsDB;
+	std::vector<renters> m_rentersInfo;
+	renters LoggedRenter;
+	std::ifstream m_isRenter;
+	std::ofstream m_osRenter;
+	// private member functions
+	void registerExistingRenters() // registering existing renters 
+	{
+		m_osRenter.open("Rental Log.txt", std::ios::app);
+		m_isRenter.open("Rental Log.txt");
+		renters existingRenter; // variables of type renters to hold the info
+		while (m_isRenter >> existingRenter) // while there is info cin it
+		{
+			m_rentersInfo.emplace_back(existingRenter); // add it to the vector
+		}
+		m_osRenter.close();
+		m_isRenter.close();
+	}
+	void printRentersInfo() // renters info printer
+	{
+		m_osRenter.open("Rental Log.txt");
+		m_isRenter.open("Rental Log.txt");
+		for (unsigned int i = 0; i < m_rentersInfo.size(); ++i) // i starts from the number of renters existing everytime
+		{
+			m_osRenter << m_rentersInfo[i]; // print renter info
+		}
+		m_osRenter.close();
+		m_isRenter.close();
+	}
+	void logInRenter()
+	{
+		std::cout << "Enter username and UI used to rent:\n";
+		std::cin >> LoggedRenter.m_renterName >> LoggedRenter.m_renterUI;
+	}
+	void rentCar()
+	{
+		unsigned int rentedCarUI; // identifying which car to rent
+		std::cout << "Enter car's UI: ";
+		std::cin >> rentedCarUI; // entering car unified number
+
+		if (m_carsDataBase->m_CarRegistrar[rentedCarUI].m_carAvailability == false) // if the car is not available 
+		{
+			std::cout << "Car is not available for renting... returning!" << std::endl; // print this
+			return; // return
+		}
+
+		m_carsDataBase->m_CarRegistrar[rentedCarUI].m_carAvailability = false; // else set the status to not available
+		renters renterInfo // create a new renter and enter the renter's info
+		(LoggedRenter.m_renterUI, LoggedRenter.m_renterName, m_carsDataBase->m_CarRegistrar[rentedCarUI].m_UI, time(NULL));
+		m_rentersInfo.emplace_back(renterInfo); // add renter to rentersInfo vector
+		printRentersInfo();
+	}
+	void returnCar()
+	{
+		logInRenter();
+		int rentedCarUI;
+		std::cout << "Enter rented car's UI: ";
+		std::cin >> rentedCarUI;
+		if (isCurrentRenter(rentedCarUI))
+		{
+			long int rentalDate = static_cast<long int>(m_rentersInfo[renterIndex(rentedCarUI)].m_timeStamp);
+			long int returnDate = static_cast<long int>(time(NULL));
+
+			std::cout << "Rented on: " << rentalTimings(rentalDate) << std::endl
+				<< "Returned on: " << rentalTimings(returnDate) << std::endl;
+
+			std::cout << "Total cost of rental over the period of " << rentalPeriod(returnDate - rentalDate) << " days: $"
+				<< rentingCost(returnDate - rentalDate) << " USD" << std::endl;
+
+			m_rentersInfo.erase(m_rentersInfo.begin() + renterIndex(rentedCarUI)); // delete the renter from vector
+			m_carsDataBase->m_CarRegistrar[rentedCarUI].m_carAvailability = true; // else set the status to not available
+			printRentersInfo();
+		}
+	}
+	std::string rentalTimings(const long int& Stamp) // calculate time of entry
+	{
+		std::string timestamp; // create a string
+		time_t T_timeStamp = Stamp; // create and set time to the time of entry
+		struct tm* entryTime = localtime(&T_timeStamp); // point entryTime to a pointer with the time info filled
+		timestamp = asctime(entryTime); // get time and assign it to the string
+		timestamp.erase(timestamp.length() - 1); // format the string such as there is no new line at the end
+		return timestamp; // return the string
+	}
+	int rentalPeriod(const long int& rentalDate, const long int& returnDate = time(NULL))
+	{
+		time_t t1 = rentalDate;
+		time_t t2 = returnDate;
+		int rentalTime = static_cast<int>(ceil(difftime(t1, t2) / 86400));
+		return rentalTime;
+	}
+
+	int renterIndex(const unsigned int& rentedCarUI);
+	renters rentedBy(const unsigned int& rentedCarUI) const;
+	bool isCurrentRenter(const unsigned int& rentedCarUI)
+	{
+		if (rentedBy(rentedCarUI) == LoggedRenter) return true;
+		else return false;
+	}
+
+	int rentingCost(const long int& rentalDuration)
+	{
+		int cost;
+		cost = static_cast<int>(74 * ceil(rentalDuration / 86400.0));
+		return cost;
+	}
+	void printRenters()
+	{
+		for (unsigned int i = 0; i < m_rentersInfo.size(); ++i)
+		{
+			std::cout << m_rentersInfo[i];
+		}
+	}
+	void printRenters(const std::string& renterUI)
+	{
+		for (unsigned int i = 0; i < m_rentersInfo.size(); ++i)
+		{
+			if (renterUI == m_rentersInfo[i].m_renterUI)
+				std::cout << m_rentersInfo[i];
+		}
+	}
+public:
+	// constructors
+	RentalSys()
+	{
+		registerExistingRenters();
+		printRentersInfo();
+	}
+	// public member functions
+	void ControlPanel();
+	void adminControlPanel();
+	void userControlPanel();
+	void adminCarsMenu();
+	void userCarsMenu();
+
+	// destructors
+	~RentalSys()
+	{
+		printRentersInfo();
+		delete m_usersDataBase;
+		delete m_carsDataBase;
+		m_rentersInfo.clear();
+	}
+};
+int RentalSys::renterIndex(const unsigned int& rentedCarUI) // used to find the index of a renter to erase it in returncar func
+{
+	for (unsigned int i = 0; i < m_rentersInfo.size(); ++i)
+	{
+		if (m_rentersInfo[i].m_carUI == rentedCarUI) return i;
+	}
+	return -1;
+}
+renters RentalSys::rentedBy(const unsigned int& rentedCarUI) const // used to compare renter's info to check if its the renter 
+{																// that wants to return the rented car
+	renters noRenter;
+	if (m_carsDataBase->m_CarRegistrar[rentedCarUI].m_carAvailability == true) // if the car is not available 
+	{
+		return noRenter;
+	}
+	else
+	{
+		for (unsigned int i = 0; i < m_rentersInfo.size(); ++i)
+		{
+			if (m_rentersInfo[i].m_carUI == rentedCarUI) noRenter = m_rentersInfo[i];
+		}
+	}
+	return noRenter;
+}
+void RentalSys::ControlPanel()
+{
+	while (true)
+	{
+		unsigned int rentalMenuChoice;
+
+		std::cout
+			<< "\n1. Admin's controls pannel" << std::endl
+			<< "2. Normal user's controls pannel" << std::endl
+			<< "3. Exit program" << std::endl;
+		std::cout << "Enter pannel choice: ";
+		std::cin >> rentalMenuChoice;
+
+		switch (rentalMenuChoice)
+		{
+		case 1: // admin controls pannel
+		{
+			adminControlPanel();
+			break; // returns to main menu
+		}
+		case 2: // regular user controls pannel
+		{
+			userControlPanel();
+			break; // returns to main list
+		}
+		case 3: exit(1); // exit program
+
+		default: // invalid input
+		{
+			std::cout << "Invalid Input... Try Again!" << std::endl;
+			break;
+		}
+		}// end of switch case structure for main menu option
+	}// end of while loop for main menu option
+	return;
+}
+void RentalSys::adminControlPanel()
+{
+	while (true)
+	{
+		unsigned int logInChoice;
+
+		std::cout << "\n1. Login" << std::endl
+			<< "2. Return" << std::endl
+			<< "3. Exit Program" << std::endl;
+		std::cout << "Enter choice: ";
+		std::cin >> logInChoice;
+
+		switch (logInChoice)
+		{
+		case 1: // log in
+		{
+			if (m_usersDataBase->logIn()) // the user exists in the data base (is an admin)
+			{
+				adminCarsMenu(); // show cars admin menu
+			}
+			else std::cout << "Wrong Credintials" << std::endl; // else print this
+			break;
+		}
+
+		case 2:	return; // return to previous list
+
+		case 3: exit(1);// exit program
+
+		default: // invalid input case
+		{
+			std::cout << "Invalid Input... Try Again!" << std::endl;
+			break;
+		}
+		}
+	}// end of while loop for admin log in
+}
+void RentalSys::userControlPanel()
+{
+	while (true)
+	{
+		unsigned int logInChoice;
+
+		std::cout << "\n1. Login" << std::endl
+			<< "2. Signup" << std::endl
+			<< "3. Return" << std::endl
+			<< "4. Exit Program" << std::endl;
+		std::cout << "Enter choice: ";
+		std::cin >> logInChoice;
+
+		switch (logInChoice)
+		{
+		case 1: // log in
+		{
+			if (m_usersDataBase->logIn()) // if the user's credentials exist in the data base
+			{
+				LoggedRenter.m_renterName = m_usersDataBase->LoggedUser.m_username; // assign the user as a renter
+				LoggedRenter.m_renterUI = m_usersDataBase->LoggedUser.m_UI;
+				userCarsMenu(); // open users' cars menu
+			}
+			else std::cout << "Wrong Credintials" << std::endl;
+			break;
+		}
+		case 2: // sign up
+		{
+			m_usersDataBase->signUp(); // sign up the user
+			LoggedRenter.m_renterName = m_usersDataBase->LoggedUser.m_username; // assign the user as a renter
+			LoggedRenter.m_renterUI = m_usersDataBase->LoggedUser.m_UI;
+			userCarsMenu(); // open users' cars menu
+		}
+		case 3: return; // return to previous list
+
+		case 4: exit(1); // exit program
+		}
+	}// end of while loop for normal user log in
+}
+void RentalSys::adminCarsMenu()
+{
+	while (true) // infinite loop for menu list options
+	{
+		int carsListChoice, carUI, numOfCars;
+
+		std::cout
+			<< "\n1. Register cars" << std::endl
+			<< "2. Print Cars' Info List" << std::endl
+			<< "3. Print Specific Car Info" << std::endl
+			<< "4. Print Renters' Info List" << std::endl
+			<< "5. Print Specific Renter's Info" << std::endl
+			<< "6. Return" << std::endl
+			<< "7. Exit" << std::endl;
+		std::cout << "Enter option: "; // input choice
+		std::cin >> carsListChoice;
+
+		switch (carsListChoice) // pick action from list
+		{
+		case 1: // register car/s
+		{
+			std::cout << "Enter number of cars: ";
+			std::cin >> numOfCars;
+			m_carsDataBase->registerNewCars(numOfCars);
+			break;
+		}
+		case 2: // print all cars' info
+		{
+			m_carsDataBase->carInfo();
+			break;
+		}
+		case 3: // print specified car's info
+		{
+			std::cout << "Enter car UI: ";
+			std::cin >> carUI;
+			m_carsDataBase->carInfo(carUI);
+			break;
+		}
+		case 4: // print all renters' info
+		{
+			printRenters();
+			break;
+		}
+		case 5: // print specified renter's info
+		{
+			std::string renterUI;
+			std::cout << "Enter renter's UI: ";
+			std::cin >> renterUI;
+			printRenters(renterUI);
+			break;
+		}
+		case 6: return; // return to previous list
+
+		case 7: exit(1); // exit program
+
+		default: // invalid input default
+		{
+			std::cout << "Invalid choice... choose again!" << std::endl;
+			break;
+		}
+		}
+	}
+}
+void RentalSys::userCarsMenu()
+{
+	while (true) // infinite loop for menu list options
+	{
+		unsigned int carsListChoice;
+
+		std::cout
+			<< "1. Print Cars List and Info" << std::endl
+			<< "2. Print Specific Car Info" << std::endl
+			<< "3. Rent a Car" << std::endl
+			<< "4. Return Rented Car" << std::endl
+			<< "5. Display Current Renting Period" << std::endl
+			<< "6. Display Cost of Renting" << std::endl
+			<< "7. Return" << std::endl
+			<< "8. Exit" << std::endl;
+		std::cout << "Enter option: "; // input choice
+		std::cin >> carsListChoice;
+
+		switch (carsListChoice) // pick action from list
+		{
+		case 1: // print all cars' info
+		{
+			m_carsDataBase->carInfo();
+			break;
+		}
+		case 2: // print specified car's info
+		{
+			unsigned int carUI;
+			std::cout << "Enter car's UI: ";
+			std::cin >> carUI;
+			m_carsDataBase->carInfo(carUI);
+			break;
+		}
+		case 3: // rent a car
+		{
+			rentCar();
+			break;
+		}
+		case 4: // return a car
+		{
+			returnCar();
+			break;
+		}
+		case 5: // display current renting period
+		{
+			std::cout << LoggedRenter.m_renterName << ", your current rental period is: "
+				<< rentalPeriod(static_cast<long int>(LoggedRenter.m_timeStamp)) << " days" << std::endl;
+			break;
+		}
+		case 6: // display cost of renting
+		{
+			double rentingPeriodInD;
+			long int rentingPeriodInS;
+			std::cout << "Enter renting period in days: ";
+			std::cin >> rentingPeriodInD;
+			rentingPeriodInS = static_cast<long int>(ceil(rentingPeriodInD)) * 86400;
+			std::cout << "Total cost for renting over the period of " << rentingPeriodInD << " days is: $"
+				<< rentingCost(rentingPeriodInS) << " USD" << std::endl;
+			break;
+		}
+		case 7: return; // return to previous list
+
+		case 8: exit(1); // exit program
+
+		default: // invalid input default
+		{
+			std::cout << "Invalid choice... choose again!" << std::endl;
+			break;
+		}
+		}
+	}
+}
+///////////////////////////////////
+//													Main program
+int main()
+{
+	//													main variables
+	RentalSys mainSystem;
+	mainSystem.ControlPanel();
+	return 0;
+}
