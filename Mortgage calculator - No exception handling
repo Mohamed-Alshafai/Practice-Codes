@@ -1,0 +1,36 @@
+package main;
+import java.text.NumberFormat;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {        
+        InterestCalculator();
+    }
+    
+    
+    public static void InterestCalculator() {
+        long principal;
+        float interest;
+        short period;
+        double mortgage;
+        
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Principal: ");
+        principal = scanner.nextLong();
+        
+        scanner.nextLine();
+        System.out.print("Annual Interest Rate: ");
+        interest = scanner.nextFloat();
+        
+        scanner.nextLine();
+        System.out.print("Period (Years): ");
+        period = scanner.nextShort();
+        scanner.close();
+
+        period*=12;
+        interest = (interest/ 100F)/12F;
+        mortgage = principal*((interest*(Math.pow(interest+1.0, period))) / (Math.pow(1.0+interest, period) - 1.0));
+        
+        System.out.println("Mortgage: " + NumberFormat.getCurrencyInstance().format(mortgage));
+    }
+}
